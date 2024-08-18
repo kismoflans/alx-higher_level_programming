@@ -1,20 +1,26 @@
-#!/usr/bin/python3
-# Lists all City objects from the database hbtn_0e_101_usa.
-# Usage: ./102-relationship_cities_states_list.py <mysql username> /
-#                                                 <mysql password> /
-#                                                 <database name>
-import sys
-from sqlalchemy import create_engine
-from sqlalchemy.orm import sessionmaker
-from relationship_state import State
-from relationship_city import City
+# relationship_state.py
+from sqlalchemy import Column, Integer, String
+from sqlalchemy.orm import relationship
+from sqlalchemy.ext.declarative import declarative_base
 
-if __name__ == "__main__":
-    engine = create_engine("mysql+mysqldb://{}:{}@localhost/{}"
-                           .format(sys.argv[1], sys.argv[2], sys.argv[3]),
-                           pool_pre_ping=True)
-    Session = sessionmaker(bind=engine)
-    session = Session()
+Base = declarative_base()
 
-    for city in session.query(City).order_by(City.id):
-        print("{}: {} -> {}".format(city.id, city.name, city.state.name))
+class State(Base):
+    __tablename__ = 'states'
+    id = Column(Integer, primary_key=True)
+    name = Column(String(128), nullable=False)
+    cities = relationship("City", back_populates="state")
+
+# relationship_city.py
+from sqlalchemy import Column, Integer, String, ForeignKey
+from sqlalchemy.orm import relationship
+from sqlalchemy.ext.declarative import declarative_base
+
+Base = declarative_base()
+
+class City(Base):
+    __tablename__ = 'cities'
+    id = Column(Integer, primary_key=True)
+    name = Column(String(128), nullable=False)
+    state_id = Column(Integer, ForeignKey('states.id'), nullable=False)
+    state = relationship("State", back_populates="cities")
