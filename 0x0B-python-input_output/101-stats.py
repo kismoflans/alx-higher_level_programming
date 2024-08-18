@@ -16,8 +16,8 @@ def print_stats(size, status_codes):
         status_codes (dict): The accumulated count of status codes.
     """
     print("File size: {}".format(size))
-    for key in sorted(status_codes):
-        print("{}: {}".format(key, status_codes[key]))
+    for code in sorted(status_codes):
+        print("{}: {}".format(code, status_codes[code]))
 
 if __name__ == "__main__":
     import sys
@@ -48,6 +48,7 @@ if __name__ == "__main__":
             if len(line) > 1 and line[-2] in valid_codes:
                 status_codes[line[-2]] = status_codes.get(line[-2], 0) + 1
 
+        # Print the final statistics on exit
         print_stats(size, status_codes)
 
     except KeyboardInterrupt:
