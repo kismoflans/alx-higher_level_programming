@@ -85,24 +85,30 @@ class Base:
             return new
 
     @classmethod
+    @classmethod
     def load_from_file(cls):
-        """Return a list of classes instantiated from a file of JSON strings.
-
+        """Return a list of instances instantiated from a file of JSON strings.
+    
         Reads from `<cls.__name__>.json`.
-
+    
         Returns:
-            If the file does not exist - an empty list.
+            If the file does not exist or is empty - an empty list.
             Otherwise - a list of instantiated classes.
         """
-        filename = str(cls.__name__) + ".json"
+        filename = f"{cls.__name__}.json"
         try:
             with open(filename, "r") as jsonfile:
-                list_dicts = Base.from_json_string(jsonfile.read())
-                return [cls.create(**d) for d in list_dicts]
+                # Read the JSON string from the file
+                json_string = jsonfile.read()
+                if json_string:
+                    list_dicts = cls.from_json_string(json_string)
+                    return [cls.create(**d) for d in list_dicts]
+                return []  # Return an empty list if the file is empty
+        except FileNotFoundError:
+            return []  # Return an empty list if the file does not exist
         except IOError:
-            return []
+            return []  # Handle other I/O errors (e.g., permission issues)
 
-    @classmethod
     def save_to_file_csv(cls, list_objs):
         """Write the CSV serialization of a list of objects to a file.
 
